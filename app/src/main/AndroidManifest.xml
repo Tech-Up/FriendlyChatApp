@@ -15,6 +15,16 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+    <activity android:name=".activities.LoginActivity">
+    </activity>
+    <activity android:name=".activities.RegisterActivity">
+    </activity>
+    <activity android:name=".activities.ForgotPasswordActivity">
+    </activity>
+    <activity android:name=".activities.HomeActivity">
+    </activity>
+    <activity android:name=".activities.ChatRoomActivity">
+    </activity>
   </application>
 
 </manifest>
