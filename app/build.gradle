@@ -33,6 +33,8 @@ dependencies {
   compile(group: 'commons-validator', name: 'commons-validator', version: '1.5.1') {
     exclude group: 'commons-logging', module: 'commons-logging'
   }
+  // https://mvnrepository.com/artifact/commons-lang/commons-lang
+  compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
   compile 'com.android.support:appcompat-v7:24.1.1'
   compile 'com.android.support:design:24.1.1'
