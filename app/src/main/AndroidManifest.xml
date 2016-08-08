@@ -8,22 +8,34 @@
       android:label="@string/app_name"
       android:supportsRtl="true"
       android:theme="@style/AppTheme">
-    <activity android:name=".MainActivity">
+    <activity
+        android:name=".activities.MainActivity"
+        android:theme="@style/AppTheme.NoActionBar">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
 
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
-    <activity android:name=".activities.LoginActivity">
+    <activity
+        android:name=".activities.LoginActivity"
+        android:label="@string/log_in">
     </activity>
-    <activity android:name=".activities.RegisterActivity">
+    <activity
+        android:name=".activities.RegisterActivity"
+        android:label="@string/register">
     </activity>
-    <activity android:name=".activities.ForgotPasswordActivity">
+    <activity
+        android:name=".activities.ForgotPasswordActivity"
+        android:label="@string/title_activity_forgot_password">
     </activity>
-    <activity android:name=".activities.HomeActivity">
+    <activity
+        android:name=".activities.HomeActivity"
+        android:label="@string/app_name">
     </activity>
-    <activity android:name=".activities.ChatRoomActivity">
+    <activity
+        android:name=".activities.ChatRoomActivity"
+        android:label="@string/chat_room">
     </activity>
   </application>
 
