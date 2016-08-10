@@ -14,8 +14,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import io.techup.android.friedlychatapp.R;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.routines.EmailValidator;
+import io.techup.android.friedlychatapp.utils.EmailChecker;
+import io.techup.android.friedlychatapp.utils.PasswordChecker;
 
 public class RegisterActivity extends AppCompatActivity
     implements View.OnClickListener, OnCompleteListener<AuthResult> {
@@ -41,7 +41,8 @@ public class RegisterActivity extends AppCompatActivity
   }
 
   @Override public void onClick(View view) {
-    if (isValidEmail(mEditTextEmail) && isValidPassword(mEditTextPassword)) {
+    if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
+        .isValid(mEditTextPassword)) {
       createUser(mEditTextEmail.getText().toString(), mEditTextPassword.getText().toString());
     }
   }
@@ -51,43 +52,6 @@ public class RegisterActivity extends AppCompatActivity
     mProgressDialog.show();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
-  }
-
-  private boolean isValidEmail(EditText editText) {
-
-    // Set string that gets the value of Email edit text
-    String email = editText.getText().toString();
-
-    // Checks if the value is empty
-    if (StringUtils.isEmpty(email)) {
-      // set error
-      editText.setError("Email should not be empty.");
-      return false;
-    }
-
-    // Validates email
-    if (!EmailValidator.getInstance().isValid(email)) {
-      // set error
-      editText.setError("Invalid email.");
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean isValidPassword(EditText editText) {
-
-    // Set string that gets the value of password edit text
-    String password = editText.getText().toString();
-
-    // Checks password length
-    if (StringUtils.length(password) < 6) {
-      // set error
-      editText.setError("password length should be at least 6 characters");
-      return false;
-    }
-
-    return true;
   }
 
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
