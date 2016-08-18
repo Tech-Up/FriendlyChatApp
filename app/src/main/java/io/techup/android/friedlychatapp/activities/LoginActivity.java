@@ -23,10 +23,10 @@ public class LoginActivity extends AppCompatActivity
 
   private EditText mEditTextEmail;
   private EditText mEditTextPassword;
-  private TextView textViewForgotPassword;
   private Button mButtonLogin;
   private Button mButtonRegister;
   private ProgressDialog mProgressDialog;
+  private TextView mTextViewForgotPassword;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -37,16 +37,18 @@ public class LoginActivity extends AppCompatActivity
   private void initView() {
     mEditTextEmail = (EditText) findViewById(R.id.edt_email);
     mEditTextPassword = (EditText) findViewById(R.id.edt_password);
-    textViewForgotPassword = (TextView) findViewById(R.id.tv_forgot_password);
     mButtonLogin = (Button) findViewById(R.id.btn_login);
     mButtonLogin.setOnClickListener(this);
     mButtonRegister = (Button) findViewById(R.id.btn_register);
     mButtonRegister.setOnClickListener(this);
+    mTextViewForgotPassword = (TextView) findViewById(R.id.tv_forgot_password);
+    mTextViewForgotPassword.setOnClickListener(this);
     mProgressDialog = new ProgressDialog(this);
     mProgressDialog.setCancelable(false);
   }
 
   @Override public void onClick(View view) {
+    Intent intent = null;
     switch (view.getId()) {
       case R.id.btn_login:
         if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
@@ -55,9 +57,14 @@ public class LoginActivity extends AppCompatActivity
         }
         break;
       case R.id.btn_register:
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
+        intent = new Intent(this, RegisterActivity.class);
         break;
+      case R.id.tv_forgot_password:
+        intent = new Intent(this, ForgotPasswordActivity.class);
+        break;
+    }
+    if (intent != null) {
+      startActivity(intent);
     }
   }
 
@@ -69,9 +76,7 @@ public class LoginActivity extends AppCompatActivity
   }
 
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
-    if (mProgressDialog != null && mProgressDialog.isShowing()) {
-      mProgressDialog.dismiss();
-    }
+    dismissProgressDialog();
     // If sign in fails, display a message to the user. If sign in succeeds
     // the auth state listener will be notified and logic to handle the
     // signed in user can be handled in the listener.
@@ -83,5 +88,16 @@ public class LoginActivity extends AppCompatActivity
       Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT)
           .show();
     }
+  }
+
+  private void dismissProgressDialog() {
+    if (mProgressDialog != null && mProgressDialog.isShowing()) {
+      mProgressDialog.dismiss();
+    }
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+    dismissProgressDialog();
   }
 }

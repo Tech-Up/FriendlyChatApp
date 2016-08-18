@@ -55,9 +55,7 @@ public class RegisterActivity extends AppCompatActivity
   }
 
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
-    if (mProgressDialog != null && mProgressDialog.isShowing()) {
-      mProgressDialog.dismiss();
-    }
+    dismissProgressDialog();
     // If sign in fails, display a message to the user. If sign in succeeds
     // the auth state listener will be notified and logic to handle the
     // signed in user can be handled in the listener.
@@ -69,5 +67,16 @@ public class RegisterActivity extends AppCompatActivity
       Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT)
           .show();
     }
+  }
+
+  private void dismissProgressDialog() {
+    if (mProgressDialog != null && mProgressDialog.isShowing()) {
+      mProgressDialog.dismiss();
+    }
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+    dismissProgressDialog();
   }
 }
