@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ChatRoomActivity extends AppCompatActivity implements ChildEventListener {
 
@@ -92,10 +94,16 @@ public class ChatRoomActivity extends AppCompatActivity implements ChildEventLis
   }
 
   @Override public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-    Message message = dataSnapshot.getValue(Message.class);
-    messagesList.add(message);
-    conversationAdapter.notifyDataSetChanged();
-    Log.d("Message data added ", message.toString());
+    Log.d("Message data added", "dataSnapshot " + dataSnapshot.toString());
+    try {
+      JSONObject jsonObject = new JSONObject(dataSnapshot.getKey());
+      Log.d("Message data added ", "JSONObject " + jsonObject.toString());
+      //Message message = new Message(jsonObject.getString(""))
+      //messagesList.add(message);
+      //conversationAdapter.notifyDataSetChanged();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {
