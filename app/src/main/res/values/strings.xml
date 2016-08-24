@@ -31,4 +31,5 @@
   <string name="join_room">Join Room</string>
   <string name="create_room">Create Room</string>
   <string name="log_out">Log out</string>
+  <string name="facebook_app_id">1758568881079161</string>
 </resources>

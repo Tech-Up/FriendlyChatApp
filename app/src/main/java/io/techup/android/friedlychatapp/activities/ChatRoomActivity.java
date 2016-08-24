@@ -1,5 +1,6 @@
 package io.techup.android.friedlychatapp.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class ChatRoomActivity extends AppCompatActivity implements ChildEventListener {
 
+  private static final String TAG = "ChatRoomActivity";
   private ListView listViewMessage;
   private List<Message> messagesList;
   private ConversationAdapter conversationAdapter;
@@ -54,17 +56,31 @@ public class ChatRoomActivity extends AppCompatActivity implements ChildEventLis
     mButtonSendMessage.setOnClickListener(view -> {
       String message = mEditTextMessage.getText().toString();
       if (StringUtils.isNotBlank(message)) {
-        sendMessage(message);
+        try {
+          sendMessage(message);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     });
   }
 
-  private void sendMessage(String messageData) {
+  private void sendMessage(String messageData) throws Exception {
     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    if (firebaseUser == null) {
+      throw new Exception("");
+    }
+
+    String photoUrl = "";
+    Uri photoUri = firebaseUser.getPhotoUrl();
+    if (photoUri != null) {
+      photoUrl = photoUri.toString();
+    }
+
     String key = databaseReference.child("messages").push().getKey();
 
     Message message =
-        new Message(firebaseUser.getUid(), messageData, firebaseUser.getDisplayName(), "");
+        new Message(firebaseUser.getUid(), messageData, firebaseUser.getDisplayName(), photoUrl);
 
     Map<String, Object> messageValues = message.toMap();
 
@@ -84,6 +100,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChildEventLis
 
   @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {
     Message message = dataSnapshot.getValue(Message.class);
+    Log.d("Message data changed", dataSnapshot.toString());
     Log.d("Message data changed", message.toString());
   }
 

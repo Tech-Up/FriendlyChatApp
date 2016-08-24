@@ -44,6 +44,10 @@ dependencies {
   compile 'com.google.firebase:firebase-auth:9.4.0'
   compile 'com.google.firebase:firebase-messaging:9.4.0'
   compile 'com.google.firebase:firebase-database:9.4.0'
+
+  // https://mvnrepository.com/artifact/com.facebook.android/facebook-android-sdk
+  compile group: 'com.facebook.android', name: 'facebook-android-sdk', version: '4.14.1'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

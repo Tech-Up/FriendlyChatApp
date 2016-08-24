@@ -10,16 +10,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import io.techup.android.friedlychatapp.R;
 import io.techup.android.friedlychatapp.utils.EmailChecker;
 import io.techup.android.friedlychatapp.utils.PasswordChecker;
 
 public class LoginActivity extends AppCompatActivity
-    implements View.OnClickListener, OnCompleteListener<AuthResult> {
+    implements View.OnClickListener, OnCompleteListener<AuthResult>, FacebookCallback<LoginResult> {
 
   private EditText mEditTextEmail;
   private EditText mEditTextPassword;
@@ -27,6 +35,9 @@ public class LoginActivity extends AppCompatActivity
   private Button mButtonRegister;
   private ProgressDialog mProgressDialog;
   private TextView mTextViewForgotPassword;
+  private LoginButton mLoginButton;
+  private CallbackManager mCallbackManager;
+  private FirebaseAuth mAuth;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -45,6 +56,15 @@ public class LoginActivity extends AppCompatActivity
     mTextViewForgotPassword.setOnClickListener(this);
     mProgressDialog = new ProgressDialog(this);
     mProgressDialog.setCancelable(false);
+
+    //Facebook Login
+    mCallbackManager = CallbackManager.Factory.create();
+    mLoginButton = (LoginButton) findViewById(R.id.login_button);
+    mLoginButton.setReadPermissions("email", "public_profile");
+    mLoginButton.registerCallback(mCallbackManager, this);
+
+    //Firebase Auth instance
+    mAuth = FirebaseAuth.getInstance();
   }
 
   @Override public void onClick(View view) {
@@ -71,8 +91,25 @@ public class LoginActivity extends AppCompatActivity
   private void signInUser(String email, String password) {
     mProgressDialog.setMessage("Logging in");
     mProgressDialog.show();
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+  }
+
+  private void handleFacebookAccessToken(AccessToken token) {
+    AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+    mAuth.signInWithCredential(credential).addOnCompleteListener(this, this);
+  }
+
+  @Override public void onSuccess(LoginResult loginResult) {
+    handleFacebookAccessToken(loginResult.getAccessToken());
+  }
+
+  @Override public void onCancel() {
+    Toast.makeText(LoginActivity.this, "Login canceled", Toast.LENGTH_SHORT).show();
+  }
+
+  @Override public void onError(FacebookException error) {
+    Toast.makeText(LoginActivity.this, "Error found: " + error.getMessage(), Toast.LENGTH_SHORT)
+        .show();
   }
 
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
@@ -88,6 +125,12 @@ public class LoginActivity extends AppCompatActivity
       Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT)
           .show();
     }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    mCallbackManager.onActivityResult(requestCode, resultCode, data);
   }
 
   private void dismissProgressDialog() {
