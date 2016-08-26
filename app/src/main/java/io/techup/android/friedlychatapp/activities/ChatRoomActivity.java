@@ -3,7 +3,6 @@ package io.techup.android.friedlychatapp.activities;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ChatRoomActivity extends AppCompatActivity implements ChildEventListener {
 
@@ -94,32 +91,31 @@ public class ChatRoomActivity extends AppCompatActivity implements ChildEventLis
   }
 
   @Override public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-    Log.d("Message data added", "dataSnapshot " + dataSnapshot.toString());
-    try {
-      JSONObject jsonObject = new JSONObject(dataSnapshot.getKey());
-      Log.d("Message data added ", "JSONObject " + jsonObject.toString());
-      //Message message = new Message(jsonObject.getString(""))
-      //messagesList.add(message);
-      //conversationAdapter.notifyDataSetChanged();
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
+
   }
 
   @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-    Message message = dataSnapshot.getValue(Message.class);
-    Log.d("Message data changed", dataSnapshot.toString());
-    Log.d("Message data changed", message.toString());
+    long lastMessage = (dataSnapshot.getChildrenCount() - 1);
+    long position = 0;
+    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+      if (position == lastMessage) {
+        Message message = postSnapshot.getValue(Message.class);
+        if (message.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+          message.setMe(true);
+        }
+        messagesList.add(message);
+      }
+      position++;
+    }
+    conversationAdapter.notifyDataSetChanged();
   }
 
   @Override public void onChildRemoved(DataSnapshot dataSnapshot) {
-    Message message = dataSnapshot.getValue(Message.class);
-    Log.d("Message data removed ", message.toString());
+
   }
 
   @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-    Message message = dataSnapshot.getValue(Message.class);
-    Log.d("Message data moved", message.toString());
+
   }
 
   @Override public void onCancelled(DatabaseError databaseError) {

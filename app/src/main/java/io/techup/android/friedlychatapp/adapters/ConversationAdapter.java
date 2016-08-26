@@ -36,17 +36,17 @@ public class ConversationAdapter extends ArrayAdapter<Message> {
     TextView textViewSender = (TextView) view.findViewById(R.id.tv_sender_message);
     TextView textViewReceiver = (TextView) view.findViewById(R.id.tv_receiver_message);
 
-    if (message.isSender()) {
+    if (message.isMe()) {
+      imageView.setVisibility(View.GONE);
+      textViewSender.setVisibility(View.GONE);
+      textViewReceiver.setVisibility(View.VISIBLE);
+      textViewReceiver.setText(message.getMessage());
+    } else {
       Glide.with(mContext).load(message.getSenderPhotoUrl()).asBitmap().into(imageView);
       imageView.setVisibility(View.VISIBLE);
       textViewSender.setVisibility(View.VISIBLE);
       textViewReceiver.setVisibility(View.GONE);
       textViewSender.setText(message.getMessage());
-    } else {
-      imageView.setVisibility(View.GONE);
-      textViewSender.setVisibility(View.GONE);
-      textViewReceiver.setVisibility(View.VISIBLE);
-      textViewReceiver.setText(message.getMessage());
     }
     return view;
   }

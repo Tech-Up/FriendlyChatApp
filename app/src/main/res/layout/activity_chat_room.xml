@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,15 +12,17 @@
   <ListView
       android:id="@+id/lv_conversations"
       android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
+      android:layout_height="wrap_content"
+      android:layout_above="@+id/container_message_writer"
       android:divider="@android:color/transparent"
       android:dividerHeight="0dp"
       />
 
   <LinearLayout
+      android:id="@+id/container_message_writer"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
       android:orientation="horizontal"
       android:padding="10dp"
       >
@@ -44,4 +46,4 @@
 
   </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

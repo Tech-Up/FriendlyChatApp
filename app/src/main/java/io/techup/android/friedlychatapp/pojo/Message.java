@@ -20,7 +20,7 @@ import java.util.Map;
 
   private String senderPhotoUrl;
 
-  @Exclude private boolean isSender;
+  @Exclude private boolean isMe;
 
   public Message() {
     super();
@@ -74,12 +74,12 @@ import java.util.Map;
     this.senderPhotoUrl = senderPhotoUrl;
   }
 
-  public boolean isSender() {
-    return isSender;
+  public boolean isMe() {
+    return isMe;
   }
 
-  public void setSender(boolean sender) {
-    isSender = sender;
+  public void setMe(boolean me) {
+    isMe = me;
   }
 
   @Override public String toString() {
@@ -89,7 +89,7 @@ import java.util.Map;
         ", message='" + message + '\'' +
         ", senderName='" + senderName + '\'' +
         ", senderPhotoUrl='" + senderPhotoUrl + '\'' +
-        ", isSender=" + isSender +
+        ", isMe=" + isMe +
         '}';
   }
 
