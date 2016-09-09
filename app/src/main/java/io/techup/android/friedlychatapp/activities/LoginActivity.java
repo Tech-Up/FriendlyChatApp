@@ -37,14 +37,22 @@ public class LoginActivity extends AppCompatActivity
   private TextView mTextViewForgotPassword;
   private LoginButton mLoginButton;
   private CallbackManager mCallbackManager;
-  private FirebaseAuth mAuth;
+  private FirebaseAuth mFirebaseAuth;
 
+  /**
+   * Activity onCreate
+   *
+   * @param savedInstanceState Bundle
+   */
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_login);
     initView();
   }
 
+  /**
+   * Initialised views
+   */
   private void initView() {
     mEditTextEmail = (EditText) findViewById(R.id.edt_email);
     mEditTextPassword = (EditText) findViewById(R.id.edt_password);
@@ -64,9 +72,12 @@ public class LoginActivity extends AppCompatActivity
     mLoginButton.registerCallback(mCallbackManager, this);
 
     //Firebase Auth instance
-    mAuth = FirebaseAuth.getInstance();
+    mFirebaseAuth = FirebaseAuth.getInstance();
   }
 
+  /**
+   * Button onClick
+   */
   @Override public void onClick(View view) {
     Intent intent = null;
     switch (view.getId()) {
@@ -88,30 +99,63 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
+  /**
+   * Sign in using email and password
+   *
+   * @param email String
+   * @param password String
+   */
   private void signInUser(String email, String password) {
+    // Set progress dialog message
     mProgressDialog.setMessage("Logging in");
     mProgressDialog.show();
-    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+
+    // Perform user login
+    mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
   }
 
+  /**
+   * Handles facebook access token, responsible for user login with facebook credentials
+   *
+   * @param token String
+   */
   private void handleFacebookAccessToken(AccessToken token) {
+    // Get credentials from facebook AccessToken
     AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-    mAuth.signInWithCredential(credential).addOnCompleteListener(this, this);
+
+    // Perform login using facebook
+    mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, this);
   }
 
+  /**
+   * On Facebook success login
+   *
+   * @param loginResult LoginResult
+   */
   @Override public void onSuccess(LoginResult loginResult) {
     handleFacebookAccessToken(loginResult.getAccessToken());
   }
 
+  /**
+   * On user canceled facebook login
+   */
   @Override public void onCancel() {
     Toast.makeText(LoginActivity.this, "Login canceled", Toast.LENGTH_SHORT).show();
   }
 
+  /**
+   * On error occur during user facebook login
+   *
+   * @param error FacebookException
+   */
   @Override public void onError(FacebookException error) {
     Toast.makeText(LoginActivity.this, "Error found: " + error.getMessage(), Toast.LENGTH_SHORT)
         .show();
   }
 
+  /**
+   * On complete Firebase login e.g. via email/password or Facebook
+   */
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
     dismissProgressDialog();
     // If sign in fails, display a message to the user. If sign in succeeds
@@ -127,18 +171,27 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+  /**
+   * Handles facebook callbackManager behaviour it triggers onSuccess/onCancel/onError facebook
+   * events
+   */
+  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     mCallbackManager.onActivityResult(requestCode, resultCode, data);
   }
 
+  /**
+   * Dismiss progress dialog
+   */
   private void dismissProgressDialog() {
     if (mProgressDialog != null && mProgressDialog.isShowing()) {
       mProgressDialog.dismiss();
     }
   }
 
+  /**
+   * On Activity destroyed
+   */
   @Override protected void onDestroy() {
     super.onDestroy();
     dismissProgressDialog();

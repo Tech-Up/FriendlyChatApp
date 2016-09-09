@@ -42,6 +42,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     startActivity(intent);
   }
 
+  //TODO display alert before user logout
   private void displayLogoutAlert() {
 
   }
