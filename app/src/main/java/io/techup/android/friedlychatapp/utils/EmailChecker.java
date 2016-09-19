@@ -20,24 +20,15 @@ public class EmailChecker {
   }
 
   public boolean isValid(EditText editText) {
-
-    // Set string that gets the value of Email edit text
-    String email = editText.getText().toString();
-
-    // Checks if the value is empty
+    boolean result = true;
+    final String email = editText.getText().toString();
     if (StringUtils.isEmpty(email)) {
-      // set error
       editText.setError("Email should not be empty.");
-      return false;
-    }
-
-    // Validates email
-    if (!EmailValidator.getInstance().isValid(email)) {
-      // set error
+      result = false;
+    } else if (!EmailValidator.getInstance().isValid(email)) {
       editText.setError("Invalid email.");
-      return false;
+      result = false;
     }
-
-    return true;
+    return result;
   }
 }

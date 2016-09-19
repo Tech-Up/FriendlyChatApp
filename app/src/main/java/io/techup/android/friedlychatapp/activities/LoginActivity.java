@@ -48,44 +48,40 @@ public class LoginActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_login);
     initView();
+    initializeFacebookLogin();
+    initializeFirebase();
   }
 
-  /**
-   * Initialised views
-   */
   private void initView() {
     mEditTextEmail = (EditText) findViewById(R.id.edt_email);
     mEditTextPassword = (EditText) findViewById(R.id.edt_password);
     mButtonLogin = (Button) findViewById(R.id.btn_login);
-    mButtonLogin.setOnClickListener(this);
     mButtonRegister = (Button) findViewById(R.id.btn_register);
-    mButtonRegister.setOnClickListener(this);
     mTextViewForgotPassword = (TextView) findViewById(R.id.tv_forgot_password);
-    mTextViewForgotPassword.setOnClickListener(this);
     mProgressDialog = new ProgressDialog(this);
-    mProgressDialog.setCancelable(false);
 
-    //Facebook Login
+    mProgressDialog.setCancelable(false);
+    mButtonLogin.setOnClickListener(this);
+    mButtonRegister.setOnClickListener(this);
+    mTextViewForgotPassword.setOnClickListener(this);
+  }
+
+  private void initializeFirebase() {
+    mFirebaseAuth = FirebaseAuth.getInstance();
+  }
+
+  private void initializeFacebookLogin() {
     mCallbackManager = CallbackManager.Factory.create();
     mLoginButton = (LoginButton) findViewById(R.id.login_button);
     mLoginButton.setReadPermissions("email", "public_profile");
     mLoginButton.registerCallback(mCallbackManager, this);
-
-    //Firebase Auth instance
-    mFirebaseAuth = FirebaseAuth.getInstance();
   }
 
-  /**
-   * Button onClick
-   */
   @Override public void onClick(View view) {
     Intent intent = null;
     switch (view.getId()) {
       case R.id.btn_login:
-        if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
-            .isValid(mEditTextPassword)) {
-          signInUser(mEditTextEmail.getText().toString(), mEditTextPassword.getText().toString());
-        }
+        loginUser();
         break;
       case R.id.btn_register:
         intent = new Intent(this, RegisterActivity.class);
@@ -99,19 +95,14 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
-  /**
-   * Sign in using email and password
-   *
-   * @param email String
-   * @param password String
-   */
-  private void signInUser(String email, String password) {
-    // Set progress dialog message
-    mProgressDialog.setMessage("Logging in");
-    mProgressDialog.show();
-
-    // Perform user login
-    mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+  private void loginUser() {
+    if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
+        .isValid(mEditTextPassword)) {
+      showProgressDialog();
+      final String email = mEditTextEmail.getText().toString();
+      final String password = mEditTextPassword.getText().toString();
+      mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+    }
   }
 
   /**
@@ -180,18 +171,17 @@ public class LoginActivity extends AppCompatActivity
     mCallbackManager.onActivityResult(requestCode, resultCode, data);
   }
 
-  /**
-   * Dismiss progress dialog
-   */
+  private void showProgressDialog() {
+    mProgressDialog.setMessage("Logging in");
+    mProgressDialog.show();
+  }
+
   private void dismissProgressDialog() {
     if (mProgressDialog != null && mProgressDialog.isShowing()) {
       mProgressDialog.dismiss();
     }
   }
 
-  /**
-   * On Activity destroyed
-   */
   @Override protected void onDestroy() {
     super.onDestroy();
     dismissProgressDialog();

@@ -19,17 +19,11 @@ public class PasswordChecker {
   }
 
   public boolean isValid(EditText editText) {
-
-    // Set string that gets the value of password edit text
-    String password = editText.getText().toString();
-
-    // Checks password length
+    final String password = editText.getText().toString();
     if (StringUtils.length(password) < 6) {
-      // set error
       editText.setError("password length should be at least 6 characters");
       return false;
     }
-
     return true;
   }
 }

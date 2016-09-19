@@ -41,32 +41,40 @@ public class RegisterActivity extends AppCompatActivity
   }
 
   @Override public void onClick(View view) {
-    if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
-        .isValid(mEditTextPassword)) {
-      createUser(mEditTextEmail.getText().toString(), mEditTextPassword.getText().toString());
+    boolean isValidatedEmailAndPassword =
+        EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
+            .isValid(mEditTextPassword);
+    if (isValidatedEmailAndPassword) {
+      createNewFirebaseUser();
     }
   }
 
-  private void createUser(String email, String password) {
-    mProgressDialog.setMessage("Creating new user");
-    mProgressDialog.show();
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+  private void createNewFirebaseUser() {
+    showProgressDialog();
+    final String email = mEditTextEmail.getText().toString();
+    final String password = mEditTextPassword.getText().toString();
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
   }
 
+  /**
+   * Firebase create new FirebaseUser callback on complete
+   */
   @Override public void onComplete(@NonNull Task<AuthResult> task) {
     dismissProgressDialog();
-    // If sign in fails, display a message to the user. If sign in succeeds
-    // the auth state listener will be notified and logic to handle the
-    // signed in user can be handled in the listener.
     if (task.isSuccessful()) {
-      Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+      final Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
       startActivity(intent);
     } else {
       Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT)
           .show();
     }
+  }
+
+  private void showProgressDialog() {
+    mProgressDialog.setMessage("Creating new user");
+    mProgressDialog.show();
   }
 
   private void dismissProgressDialog() {

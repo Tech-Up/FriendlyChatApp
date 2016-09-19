@@ -46,15 +46,15 @@ public class ForgotPasswordActivity extends AppCompatActivity
   }
 
   private void requestResetPassword(String email) {
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     mAuth.sendPasswordResetEmail(email).addOnCompleteListener(this);
   }
 
   @Override public void onComplete(@NonNull Task<Void> task) {
     dismissProgressDialog();
-    
+
     if (task.isSuccessful()) {
-      Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
+      final Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
       startActivity(intent);
     } else {

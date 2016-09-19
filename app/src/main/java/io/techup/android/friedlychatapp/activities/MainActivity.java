@@ -22,16 +22,17 @@ public class MainActivity extends SplashActivity {
 
   @Override public void done() {
     Intent intent = null;
-    // Checks if firebase user is available
-    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-    if (firebaseUser == null) {
-      // We need to redirect user to login screen
-      intent = new Intent(this, LoginActivity.class);
-    } else {
-      // redirect to Home
+    if (isUserLoggedIn()) {
       intent = new Intent(this, HomeActivity.class);
+    } else {
+      intent = new Intent(this, LoginActivity.class);
     }
     startActivity(intent);
     finish();
+  }
+
+  public boolean isUserLoggedIn() {
+    final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    return firebaseUser != null;
   }
 }

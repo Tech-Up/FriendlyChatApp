@@ -27,14 +27,14 @@ public class ConversationAdapter extends ArrayAdapter<Message> {
   }
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
-    LayoutInflater inflater =
+    final LayoutInflater inflater =
         (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    View view = inflater.inflate(R.layout.conversation_item, parent, false);
-    Message message = mMessages.get(position);
+    final View view = inflater.inflate(R.layout.conversation_item, parent, false);
+    final ImageView imageView = (ImageView) view.findViewById(R.id.sender_photo);
+    final TextView textViewSender = (TextView) view.findViewById(R.id.tv_sender_message);
+    final TextView textViewReceiver = (TextView) view.findViewById(R.id.tv_receiver_message);
 
-    ImageView imageView = (ImageView) view.findViewById(R.id.sender_photo);
-    TextView textViewSender = (TextView) view.findViewById(R.id.tv_sender_message);
-    TextView textViewReceiver = (TextView) view.findViewById(R.id.tv_receiver_message);
+    final Message message = mMessages.get(position);
 
     if (message.isMe()) {
       imageView.setVisibility(View.GONE);
