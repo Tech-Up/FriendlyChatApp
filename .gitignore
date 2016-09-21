@@ -92,3 +92,4 @@ captures/
 *.jks
 /.idea/
 /.gitignore
+/projectFilesBackup/
