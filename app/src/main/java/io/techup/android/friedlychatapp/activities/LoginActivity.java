@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity
     mLoginButton.registerCallback(mCallbackManager, this);
   }
 
-  @Override public void onClick(View view) {
+  @Override public void onClick(final View view) {
     Intent intent = null;
     switch (view.getId()) {
       case R.id.btn_login:
@@ -96,8 +96,10 @@ public class LoginActivity extends AppCompatActivity
   }
 
   private void loginUser() {
-    if (EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
-        .isValid(mEditTextPassword)) {
+    boolean isValidEmail =
+        EmailChecker.getInstance().isValid(mEditTextEmail) && PasswordChecker.getInstance()
+            .isValid(mEditTextPassword);
+    if (isValidEmail) {
       showProgressDialog();
       final String email = mEditTextEmail.getText().toString();
       final String password = mEditTextPassword.getText().toString();
@@ -110,11 +112,8 @@ public class LoginActivity extends AppCompatActivity
    *
    * @param token String
    */
-  private void handleFacebookAccessToken(AccessToken token) {
-    // Get credentials from facebook AccessToken
-    AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-
-    // Perform login using facebook
+  private void handleFacebookAccessToken(final AccessToken token) {
+    final AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
     mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, this);
   }
 
@@ -123,7 +122,7 @@ public class LoginActivity extends AppCompatActivity
    *
    * @param loginResult LoginResult
    */
-  @Override public void onSuccess(LoginResult loginResult) {
+  @Override public void onSuccess(final LoginResult loginResult) {
     handleFacebookAccessToken(loginResult.getAccessToken());
   }
 
@@ -139,7 +138,7 @@ public class LoginActivity extends AppCompatActivity
    *
    * @param error FacebookException
    */
-  @Override public void onError(FacebookException error) {
+  @Override public void onError(final FacebookException error) {
     Toast.makeText(LoginActivity.this, "Error found: " + error.getMessage(), Toast.LENGTH_SHORT)
         .show();
   }
@@ -147,13 +146,13 @@ public class LoginActivity extends AppCompatActivity
   /**
    * On complete Firebase login e.g. via email/password or Facebook
    */
-  @Override public void onComplete(@NonNull Task<AuthResult> task) {
+  @Override public void onComplete(@NonNull final Task<AuthResult> task) {
     dismissProgressDialog();
     // If sign in fails, display a message to the user. If sign in succeeds
     // the auth state listener will be notified and logic to handle the
     // signed in user can be handled in the listener.
     if (task.isSuccessful()) {
-      Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+      final Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
       startActivity(intent);
     } else {

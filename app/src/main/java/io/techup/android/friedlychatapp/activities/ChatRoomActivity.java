@@ -29,14 +29,12 @@ public class ChatRoomActivity extends AppCompatActivity
 
   private static final String TAG = "ChatRoomActivity";
 
-  private ListView listViewMessage;
   private List<Message> messagesList;
   private ConversationAdapter conversationAdapter;
   private DatabaseReference databaseReference;
-  private Button mButtonSendMessage;
   private EditText mEditTextMessage;
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
+  @Override protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_chat_room);
     initFirebaseDatabase();
@@ -44,21 +42,21 @@ public class ChatRoomActivity extends AppCompatActivity
   }
 
   private void initFirebaseDatabase() {
-    databaseReference = FirebaseDatabase.getInstance().getReference();
+    databaseReference = FirebaseDatabase.getInstance().getReference("messages");
     databaseReference.addChildEventListener(this);
   }
 
   private void initView() {
-    listViewMessage = (ListView) findViewById(R.id.lv_conversations);
+    final ListView listViewMessage = (ListView) findViewById(R.id.lv_conversations);
+    final Button mButtonSendMessage = (Button) findViewById(R.id.btn_send_message);
     mEditTextMessage = (EditText) findViewById(R.id.edt_message);
-    mButtonSendMessage = (Button) findViewById(R.id.btn_send_message);
-    messagesList = new ArrayList<>();
+    messagesList = getAllPreviousMessage();
     conversationAdapter = new ConversationAdapter(this, messagesList);
     listViewMessage.setAdapter(conversationAdapter);
     mButtonSendMessage.setOnClickListener(this);
   }
 
-  @Override public void onClick(View view) {
+  @Override public void onClick(final View view) {
     switch (view.getId()) {
       case R.id.btn_send_message:
         sendMessageFromEditTextMessage();
@@ -74,57 +72,60 @@ public class ChatRoomActivity extends AppCompatActivity
       } catch (final Exception e) {
         e.printStackTrace();
       }
+      mEditTextMessage.setText("");
     }
   }
 
-  private void sendMessage(String messageData) throws Exception {
-    final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-    if (firebaseUser == null) {
-      throw new Exception("User not found");
-    }
-    String photoUrl = "";
-    final Uri photoUri = firebaseUser.getPhotoUrl();
-    if (photoUri != null) {
-      photoUrl = photoUri.toString();
-    }
+  private void sendMessage(final String messageData) throws Exception {
+    final FirebaseUser firebaseUser = getFirebaseUser();
+    final String photoUrl = getFirebasePhotoUri(firebaseUser);
     final String key = databaseReference.child("messages").push().getKey();
     final Message message =
         new Message(firebaseUser.getUid(), messageData, firebaseUser.getDisplayName(), photoUrl);
     final Map<String, Object> messageValues = message.toMap();
     final Map<String, Object> childUpdates = new HashMap<>();
-    childUpdates.put("/messages/" + key, messageValues);
+    childUpdates.put("/" + key, messageValues);
     databaseReference.updateChildren(childUpdates);
   }
 
-  @Override public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+  private FirebaseUser getFirebaseUser() throws Exception {
+    final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    if (firebaseUser == null) {
+      throw new Exception("User not found");
+    }
+    return firebaseUser;
   }
 
-  @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-    long lastMessage = (dataSnapshot.getChildrenCount() - 1);
-    long position = 0;
-    for (final DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-      if (position == lastMessage) {
-        final Message message = postSnapshot.getValue(Message.class);
-        if (message.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-          message.setMe(true);
-        }
-        messagesList.add(message);
-      }
-      position++;
+  private String getFirebasePhotoUri(FirebaseUser firebaseUser) {
+    final Uri photoUri = firebaseUser.getPhotoUrl();
+    if (photoUri != null) {
+      return photoUri.toString();
     }
+    return "";
+  }
+
+  @Override public void onChildAdded(final DataSnapshot dataSnapshot, final String s) {
+    final Message message = dataSnapshot.getValue(Message.class);
+    if (message.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+      message.setMe(true);
+    }
+    messagesList.add(message);
     conversationAdapter.notifyDataSetChanged();
   }
 
-  @Override public void onChildRemoved(DataSnapshot dataSnapshot) {
+  @Override public void onChildChanged(final DataSnapshot dataSnapshot, final String s) {
 
   }
 
-  @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+  @Override public void onChildRemoved(final DataSnapshot dataSnapshot) {
 
   }
 
-  @Override public void onCancelled(DatabaseError databaseError) {
+  @Override public void onChildMoved(final DataSnapshot dataSnapshot, final String s) {
+
+  }
+
+  @Override public void onCancelled(final DatabaseError databaseError) {
     Toast.makeText(ChatRoomActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
     databaseError.toException().printStackTrace();
   }
@@ -134,5 +135,10 @@ public class ChatRoomActivity extends AppCompatActivity
     if (databaseReference != null) {
       databaseReference.removeEventListener(this);
     }
+  }
+
+  private List<Message> getAllPreviousMessage() {
+    //TODO get all previous message from firebase
+    return new ArrayList<>();
   }
 }
