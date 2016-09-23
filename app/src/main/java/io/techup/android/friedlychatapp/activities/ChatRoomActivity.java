@@ -50,7 +50,7 @@ public class ChatRoomActivity extends AppCompatActivity
     final ListView listViewMessage = (ListView) findViewById(R.id.lv_conversations);
     final Button mButtonSendMessage = (Button) findViewById(R.id.btn_send_message);
     mEditTextMessage = (EditText) findViewById(R.id.edt_message);
-    messagesList = getAllPreviousMessage();
+    messagesList = new ArrayList<>();
     conversationAdapter = new ConversationAdapter(this, messagesList);
     listViewMessage.setAdapter(conversationAdapter);
     mButtonSendMessage.setOnClickListener(this);
@@ -79,13 +79,18 @@ public class ChatRoomActivity extends AppCompatActivity
   private void sendMessage(final String messageData) throws Exception {
     final FirebaseUser firebaseUser = getFirebaseUser();
     final String photoUrl = getFirebasePhotoUri(firebaseUser);
-    final String key = databaseReference.child("messages").push().getKey();
+    final String key = generateFirebaseMessageKey();
     final Message message =
         new Message(firebaseUser.getUid(), messageData, firebaseUser.getDisplayName(), photoUrl);
     final Map<String, Object> messageValues = message.toMap();
     final Map<String, Object> childUpdates = new HashMap<>();
+
     childUpdates.put("/" + key, messageValues);
     databaseReference.updateChildren(childUpdates);
+  }
+
+  private String generateFirebaseMessageKey() {
+    return databaseReference.child("messages").push().getKey();
   }
 
   private FirebaseUser getFirebaseUser() throws Exception {
@@ -96,7 +101,7 @@ public class ChatRoomActivity extends AppCompatActivity
     return firebaseUser;
   }
 
-  private String getFirebasePhotoUri(FirebaseUser firebaseUser) {
+  private String getFirebasePhotoUri(final FirebaseUser firebaseUser) {
     final Uri photoUri = firebaseUser.getPhotoUrl();
     if (photoUri != null) {
       return photoUri.toString();
@@ -118,7 +123,7 @@ public class ChatRoomActivity extends AppCompatActivity
   }
 
   @Override public void onChildRemoved(final DataSnapshot dataSnapshot) {
-
+    
   }
 
   @Override public void onChildMoved(final DataSnapshot dataSnapshot, final String s) {
@@ -135,10 +140,5 @@ public class ChatRoomActivity extends AppCompatActivity
     if (databaseReference != null) {
       databaseReference.removeEventListener(this);
     }
-  }
-
-  private List<Message> getAllPreviousMessage() {
-    //TODO get all previous message from firebase
-    return new ArrayList<>();
   }
 }
